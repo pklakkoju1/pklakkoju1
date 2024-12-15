@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cable Network Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #002366; /* Dark blue */
+            color: #fff;
+            padding: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: #77aaff 3px solid;
+            transition: background-color 0.3s;
+        }
+        header:hover {
+            background-color: #003399; /* Slightly lighter dark blue */
+        }
+        header img {
+            height: 78px; /* Increased by 20% from 65px */
+            margin-right: 20px;
+        }
+        header nav {
+            display: flex;
+        }
+        header nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        header nav ul li {
+            margin-left: 20px;
+        }
+        header nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        header nav ul li a:hover {
+            color: #77aaff;
+        }
+        .content {
+            padding: 20px;
+            background: #fff;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .content:hover {
+            transform: scale(1.02);
+        }
+        footer {
+            background: #002366; /* Dark blue */
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        footer:hover {
+            background-color: #003399; /* Slightly lighter dark blue */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div id="branding">
+                <img src="logo.png" alt="Cable Network Logo">
+                <h1>Cable Network Management</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="add_customer.php">Add Customer</a></li>
+                    <li><a href="add_payment.php">Add Payment</a></li>
+                    <li><a href="search_customer.php">Search Customer</a></li>
+                    <li><a href="manage_payments.php">Mng Payment</a></li>
+                    <li><a href="reports.php">Reports</a></li>
+                    <li><a href="customer_report.php">Cus Reports</a></li>
+                    <li><a href="logout.php">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <h2>Welcome, <!-- Add PHP code here to display username --> </h2>
+            <p>Use the navigation links above to manage customers, payments, and generate reports.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Cable Network Management © 2024</p>
+    </footer>
+</body>
+</html>

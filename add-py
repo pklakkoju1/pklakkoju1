@@ -1,0 +1,266 @@
+<?php
+include 'config.php';
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$customers = [];
+$not_found_message = "";
+$balance = 0;
+$customer_name = "";
+
+if (isset($_POST['search_customer'])) {
+    $search_value = $_POST['search_value'];
+    $search_type = $_POST['search_type'];
+
+    $stmt = $conn->prepare("SELECT * FROM customers WHERE $search_type LIKE ?");
+    $search_value = "%$search_value%";
+    $stmt->bind_param("s", $search_value);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $customers[] = $row;
+        }
+    } else {
+        $not_found_message = "No customer found with the given $search_type.";
+    }
+}
+
+if (isset($_POST['customer_id'])) {
+    $customer_id = $_POST['customer_id'];
+
+    $stmt = $conn->prepare("SELECT * FROM customers WHERE customer_id = ?");
+    $stmt->bind_param("i", $customer_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $customer = $result->fetch_assoc();
+    $customer_name = $customer['customer_name'];
+    $balance = $customer['balance'];
+}
+
+if (isset($_POST['add_payment'])) {
+    $customer_id = $_POST['customer_id'];
+    $amount = $_POST['amount'];
+    $payment_date = $_POST['payment_date'];
+    $payment_status = $_POST['payment_status'];
+    $payment_type = $_POST['payment_type'];
+    $new_balance = $balance + $amount;
+
+    $stmt = $conn->prepare("INSERT INTO payments (customer_id, amount, payment_date, payment_status, payment_type) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("iisss", $customer_id, $amount, $payment_date, $payment_status, $payment_type);
+    if ($stmt->execute()) {
+        $stmt = $conn->prepare("UPDATE customers SET balance = ? WHERE customer_id = ?");
+        $stmt->bind_param("di", $new_balance, $customer_id);
+        if ($stmt->execute()) {
+            echo "Payment added successfully. New Balance: $new_balance";
+        } else {
+            echo "Error updating balance: " . $stmt->error;
+        }
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+
+    $stmt = $conn->prepare("SELECT balance FROM customers WHERE customer_id = ?");
+    $stmt->bind_param("i", $customer_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $customer = $result->fetch_assoc();
+    $balance = $customer['balance'];
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Payment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #77aaff 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header ul {
+            padding: 0;
+            list-style: none;
+        }
+        header li {
+            float: left;
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        header #branding {
+            float: left;
+        }
+        header #branding h1 {
+            margin: 0;
+        }
+        header nav {
+            float: right;
+            margin-top: 10px;
+        }
+        header .highlight, header .current a {
+            color: #77aaff;
+            font-weight: bold;
+        }
+        header a:hover {
+            color: #77aaff;
+            font-weight: bold;
+        }
+        #showcase {
+            min-height: 400px;
+            background: url('showcase.jpg') no-repeat 0 -400px;
+            text-align: center;
+            color: #fff;
+        }
+        #showcase h1 {
+            margin-top: 100px;
+            font-size: 55px;
+            margin-bottom: 10px;
+        }
+        #showcase p {
+            font-size: 20px;
+        }
+        .button_1 {
+            height: 38px;
+            background: #77aaff;
+            border: 0;
+            padding-left: 20px;
+            padding-right: 20px;
+            color: #fff;
+        }
+        .button_1:hover {
+            background: #0056b3;
+            cursor: pointer;
+        }
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            margin-top: 0;
+        }
+        .form-container input[type="text"],
+        .form-container input[type="number"],
+        .form-container input[type="date"],
+        .form-container select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+        }
+        .form-container input[type="submit"] {
+            background: #77aaff;
+            color: #fff;
+            border: 0;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .form-container input[type="submit"]:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div id="branding">
+                <h1><span class="highlight">Cable TV</span> Management</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li class="current"><a href="index.php">Home</a></li>
+                    <li><a href="customers.php">Customers</a></li>
+                    <li><a href="payments.php">Payments</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="form-container">
+            <h2>Add Payment</h2>
+            <form action="add_payment.php" method="post">
+                <label for="search_type">Search Customer:</label>
+                <select name="search_type" id="search_type">
+                    <option value="customer_name">Name</option>
+                    <option value="stb_id">STB ID</option>
+                    <option value="phone_number">Phone Number</option>
+                </select>
+                <input type="text" name="search_value" required>
+                <input type="submit" name="search_customer" value="Search" class="button_1">
+            </form>
+
+            <?php if ($not_found_message): ?>
+                <p><?php echo $not_found_message; ?></p>
+            <?php endif; ?>
+
+            <?php if (!empty($customers)): ?>
+                <form action="add_payment.php" method="post">
+                    <label for="customer_id">Select Customer:</label>
+                    <select name="customer_id" id="customer_id" required onchange="this.form.submit()">
+                        <option value="">Select</option>
+                        <?php foreach ($customers as $customer): ?>
+                            <option value="<?php echo $customer['customer_id']; ?>">
+                                <?php echo $customer['customer_name'] . " - " . $customer['stb_id'] . " - " . $customer['phone_number']; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select><br>
+                </form>
+            <?php endif; ?>
+
+            <?php if (isset($_POST['customer_id']) && !empty($_POST['customer_id'])): ?>
+                <form action="add_payment.php" method="post">
+                    <input type="hidden" name="customer_id" value="<?php echo $_POST['customer_id']; ?>">
+                    <label for="customer_name">Customer Name:</label>
+                    <input type="text" name="customer_name" value="<?php echo $customer_name; ?>" readonly><br>
+                    <label for="balance">Old Balance:</label>
+                    <input type="text" name="balance" value="<?php echo $balance; ?>" readonly><br>
+                    <label for="amount">Amount:</label>
+                    <input type="number" name="amount" required><br>
+                    <label for="payment_date">Payment Date:</label>
+                    <input type="date" name="payment_date" required><br>
+                    <label for="payment_status">Payment Status:</label>
+                    <select name="payment_status" required>
+                        <option value="Paid">Paid</option>
+                        <option value="Not Paid">Not Paid</option>
+                    </select><br>
+                    <label for="payment_type">Payment Type:</label>
+                    <select name="payment_type" required>
+                        <option value="Cash">Cash</option>
+                        <option value="UPI">UPI</option>
+                    </select><br>
+                    <label for="new_balance">New Balance:</label>
+                    <input type="number" name="new_balance" required><br>
+                    <input type="submit" name="add_payment" value="Add Payment" class="button_1">
+                </form>
+            <?php endif; ?>
+        </div>
+    </div>
+</body>
+</html>

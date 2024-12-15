@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer Management</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Add Customer</h2>
+        <form action="add_customer.php" method="post">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name">
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <textarea class="form-control" id="address" name="address"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="phone_number">Phone Number:</label>
+                <input type="text" class="form-control" id="phone_number" name="phone_number">
+            </div>
+            <div class="form-group">
+                <label for="stb_id">STB ID:</label>
+                <input type="text" class="form-control" id="stb_id" name="stb_id">
+            </div>
+            <div class="form-group">
+                <label for="pack">Pack:</label>
+                <input type="text" class="form-control" id="pack" name="pack">
+            </div>
+            <div class="form-group">
+                <label for="connection_date">Connection Date:</label>
+                <input type="date" class="form-control" id="connection_date" name="connection_date">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
